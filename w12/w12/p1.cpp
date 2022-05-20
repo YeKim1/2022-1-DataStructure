@@ -22,7 +22,7 @@ struct Entry {
 	}
 
 	void erase() {
-		valid = AVAILABLE;
+		valid = AVAILABLE;	
 	}
 };
 
