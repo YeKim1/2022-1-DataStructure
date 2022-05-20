@@ -20,7 +20,7 @@ struct Entry {
 	Entry(string key, string value) {
 		this->key = key;
 		this->value = value;
-		valid = SIGNUP;
+		valid = LOGOUT;
 	}
 
 	void Login() {
@@ -53,7 +53,7 @@ public:
 	}
 
 	void signup(string k, string v) {
-		if (find(k) != "None") {
+		if (isFind(k) == false) {
 			cout << "Submit" << endl;
 			put(k, v);
 		}
@@ -63,45 +63,34 @@ public:
 	}
 
 	void put(string key, string value) {
-		int index = hash_func(key);
-		int probing = 1;
-
-		hash_table[index] = Entry(key, value);
+		hash_table[hash_func(key)] = Entry(key, value);
 	}
 
 	void Login(string key, string value) {
-		if (find(key) == "None" || find(key) != value || hash_table[hash_func(key)].valid == NOITEM) {
+		if (isFind(key) == false || hash_table[hash_func(key)].value != value) {
 			cout << "Invalid" << endl;
 			return;
 		}
 
-		else if (hash_table[hash_func(key)].valid == LOGIN) {
+		else if (hash_table[hash_func(key)].value==value && hash_table[hash_func(key)].valid == LOGIN) {
 			cout << "Quit" << endl;
 		}
 
-		else {
+		else if (hash_table[hash_func(key)].value == value && hash_table[hash_func(key)].valid == LOGOUT) {
 			cout << "Submit" << endl;
-			hash_table[hash_func(key)].valid = LOGIN;
+			hash_table[hash_func(key)].Login();
 		}
 	}
 
 	void Logout(string key) {
-		hash_table[hash_func(key)].valid = LOGOUT;
+		hash_table[hash_func(key)].Logout();
+		cout << "Submit" << endl;
 	}
 
 
-	string find(string key) {
-		int index = hash_func(key);
-		int probing = 1;
-
-		while (hash_table[index].valid != NOITEM && probing <= capacity) {
-			if (hash_table[index].key == key) {
-				return hash_table[index].value;
-			}
-			index += 1;
-			probing++;
-		}
-		return "None";
+	bool isFind(string k) {
+		if (hash_table[hash_func(k)].valid == NOITEM) return false;
+		else return true;
 	}
 
 };
@@ -111,7 +100,7 @@ int main() {
 
 	cin >> T;
 
-	HashTable* HT = new HashTable(400000);
+	HashTable* HT = new HashTable(200000);
 
 	string str, K, V;
 
