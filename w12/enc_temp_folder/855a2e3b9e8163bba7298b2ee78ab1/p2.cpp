@@ -5,8 +5,6 @@
 #define LOGIN 2
 using namespace std;
 
-// find 다시 설계.. ... .............................
-
 struct Entry {
 	string ID;
 	string PASSWORD;
@@ -99,13 +97,11 @@ public:
 		int idx = hash_func(i);
 		int probing = 1;
 
-		while (hash_table[idx].valid != NOITEM && probing <= capacity) {
+		while (idx <= capacity) {
 			if (hash_table[idx].ID == i) return hash_table[idx];
 			idx += 1;
 			probing++;
 		}
-
-		return;
 
 	}
 
