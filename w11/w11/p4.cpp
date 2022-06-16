@@ -15,35 +15,36 @@ struct node {
 class BST {
 private:
 	node* root;
-	int size;
 public:
 	BST() {
 		root = NULL;
-		size = 0;
 	}
 
-	int depth(node* cur) {
+	node* r() { return root; }
+
+	int depth(node* n) {
 		int d = 0;
-		while (cur != root) {
-			cur = cur->parent;
+
+		while (n != root) {
+			n = n->parent;
 			d++;
 		}
+
 		return d;
 	}
 
-	node* search(node* cur, int key) {
-		if (cur == NULL) return NULL;
+	node* search(node* n, int k) {
+		if (n == NULL) return NULL;
 
-		if (cur->key == key) return cur;
-		else if (cur->key < key) return search(cur->right, key);
-		else return search(cur->left, key);
-
+		if (n->key == k) return n;
+		else if (n->key > k) return search(n->left, k);
+		else return search(n->right, k);
 	}
 
-	void insert(int key) {
-		if (search(root, key) != NULL) return;
+	void insert(int k) {
+		if (search(root, k) != NULL) return;
 
-		node* newNode = new node(key);
+		node* newNode = new node(k);
 
 		if (root == NULL) {
 			root = newNode;
@@ -56,22 +57,21 @@ public:
 
 		while (cur != NULL) {
 			par = cur;
-			if (cur->key > key) cur = cur->left;
+			
+			if (cur->key > k) cur = cur->left;
 			else cur = cur->right;
 		}
 
 		newNode->parent = par;
-		if (par->key > key) par->left = newNode;
+
+		if (par->key > k) par->left = newNode;
 		else par->right = newNode;
 
-		size++;
-
 		cout << depth(newNode) << endl;
-
 	}
 
-	void remove(int key) {
-		node* delNode = search(root, key);
+	void remove(int k) {
+		node* delNode = search(root, k);
 		if (delNode == NULL) return;
 
 		cout << depth(delNode) << endl;
@@ -79,9 +79,9 @@ public:
 		node* par = delNode->parent;
 		node* child;
 
-		if (delNode->left == NULL && delNode->right == NULL) child = NULL;
-		else if (delNode->left != NULL && delNode->right == NULL) child = delNode->left;
-		else if (delNode->left == NULL && delNode->right != NULL) child = delNode->right;
+		if (delNode->right == NULL && delNode->left == NULL) child = NULL;
+		else if (delNode->right != NULL && delNode->left == NULL) child = delNode->right;
+		else if (delNode->right == NULL && delNode->left != NULL) child = delNode->left;
 		else {
 			child = delNode->right;
 
@@ -97,33 +97,26 @@ public:
 			root = child;
 			if (child != NULL) root->parent = NULL;
 		}
+
+		else if (delNode == par->right) {
+			par->right = child;
+			if (child != NULL) child->parent = par;
+		}
 		else if (delNode == par->left) {
 			par->left = child;
 			if (child != NULL) child->parent = par;
 		}
-		else {
-			par->right = child;
-			if (child != NULL) child->parent = par;
-		}
-
-		size--;
 
 		delete delNode;
 	}
 
-
-	node* min(node* n, int& k) {
+	node* max(node* n, int& k) {
 		if (n == NULL) return NULL;
-
-		node* left = min(n->left, k);
-
-		if (left != NULL) return left;
-
+		node* right = max(n->right, k);
+		if (right != NULL) return right;
 		k--;
 		if (k == 0) return n;
-
-		return min(n->right, k);
-
+		return max(n->left, k);
 	}
 
 	int height(node* n) {
@@ -132,20 +125,6 @@ public:
 			int left_h = height(n->left);
 			int right_h = height(n->right);
 			return 1 + (left_h > right_h ? left_h : right_h);
-		}
-	}
-
-	node* r() { return root; }
-
-	int size_() { return size; }
-
-	void inorder(node* n) {
-		if (n != NULL) {
-
-			inorder(n->left);
-			cout << n->key << " ";
-			inorder(n->right);
-
 		}
 	}
 };
@@ -157,8 +136,10 @@ int main() {
 	BST* bst = new BST();
 
 	string s;
+
 	for (int i = 0; i < T; i++) {
-		cin >> s;
+		cin >> s; 
+
 		if (s == "insert") {
 			cin >> x;
 			bst->insert(x);
@@ -167,12 +148,9 @@ int main() {
 			cin >> x;
 			bst->remove(x);
 		}
-		else if (s == "print") {
-			bst->inorder(bst->r());
-		}
-		else if (s == "min") {
+		else if (s == "max") {
 			cin >> x;
-			cout << bst->min(bst->r(), x)->key << endl;
+			cout << bst->max(bst->r(), x)->key << endl;
 		}
 		else if (s == "height") {
 			cin >> x;

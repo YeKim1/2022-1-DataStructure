@@ -4,11 +4,11 @@ using namespace std;
 struct node {
 	int key;
 	node* parent;
-	node* right;
 	node* left;
+	node* right;
 	node(int k) {
 		key = k;
-		parent = right = left = NULL;
+		parent = left = right = NULL;
 	}
 };
 
@@ -24,28 +24,28 @@ public:
 		else return search(n->right, k);
 	}
 
-	void insert(int e) {
-		if (search(root, e) != NULL) return;
+	void insert(int k) {
+		if (search(root, k) != NULL) return;
 
-		node* newNode = new node(e);
+		node* newNode = new node(k);
 
 		if (root == NULL) {
 			root = newNode;
 			return;
 		}
+
 		node* cur = root;
 		node* par = NULL;
 
 		while (cur != NULL) {
 			par = cur;
-			
-			if (cur->key > e) cur = cur->left;
+			if (cur->key > k) cur = cur->left;
 			else cur = cur->right;
 		}
 
 		newNode->parent = par;
-		
-		if (par->key > e) par->left = newNode;
+
+		if (par->key > k) par->left = newNode;
 		else par->right = newNode;
 	}
 
@@ -56,7 +56,9 @@ public:
 			count++;
 			inorder(n->right, count);
 			return count;
+
 		}
+
 		else return count;
 	}
 
@@ -78,6 +80,7 @@ int main() {
 	for (int i = 0; i < m; i++) {
 		cin >> x;
 		int count = 0;
-		cout << bst->inorder(bst->search(bst->r(), x)->left, count) << endl;
+		cout << bst->inorder(bst->search(bst->r(), x)->right, count) << endl;
 	}
+
 }

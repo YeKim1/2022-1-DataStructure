@@ -5,132 +5,106 @@
 #define LOGIN 2
 using namespace std;
 
-// find 다시 설계.. ... .............................
+// 오답..
+
 
 struct Entry {
-	string ID;
-	string PASSWORD;
+	string id;
+	string password;
 	int valid;
 
 	Entry() {
-		ID = "";
-		PASSWORD = "";
+		id = "";
+		password = "";
 		valid = NOITEM;
 	}
 
-	Entry(string I, string P) {
-		ID = I;
-		PASSWORD = P;
+	Entry(string id, string password) {
+		this->id = id;
+		this->password = password;
 		valid = LOGOUT;
 	}
 
-	void valid_LOGIN() {
+	void Login() {
 		valid = LOGIN;
 	}
 
-	void valid_LOGOUT() {
+	void Logout() {
 		valid = LOGOUT;
 	}
-	
 };
 
 class HashTable {
+private:
 	Entry* hash_table;
 	int capacity;
 
-	int hash_func(string ID) {
+	int hash_func(string id) {
 		int sum = 0;
-		for (int i = 0; i < ID.length(); i++) {
-			sum += (ID[i] - 'a') * pow(26, i);
+		for (int i = 0; i < id.length(); i++) {
+			sum += (id[i] - 'a') * pow(26, i);
 		}
 		return sum % capacity;
 	}
 
 public:
-	HashTable(int c) {
-		capacity = c;
+	HashTable() {
+		capacity = 250000;
 		hash_table = new Entry[capacity];
 	}
 
-	void put(string i, string p) {
-		int idx = hash_func(i);
-		int probing = 1;
+	void signUp(string id, string password) {
+		int index = hash_func(id);
 
-		while (hash_table[idx].valid != NOITEM && probing <= capacity) {
-			idx += 1;
-			probing++;
-		}
-		
-		if (probing > capacity) return;
-		hash_table[idx] = Entry(i, p);
-		return;
-	}
-
-
-	void signup(string i, string p) {
-		if (find(i).valid == NOITEM) { // 등록한 적 없는 ID
+		if (hash_table[index].valid == NOITEM) {
 			cout << "Submit" << endl;
-			put(i, p);
+			hash_table[index] = Entry(id, password);
 		}
-		else {
-			cout << "Invalid" << endl;
-		}
+		else cout << "Invalid" << endl;
 	}
 
-	void login(string i, string p) {
-		if (find(i).valid == NOITEM || find(i).PASSWORD != p) {
+	void logIn(string id, string password) {
+		int index = hash_func(id);
+
+		if (hash_table[index].valid == NOITEM || hash_table[index].password != password) {
 			cout << "Invalid" << endl;
 		}
-		else if (find(i).PASSWORD == p && find(i).valid == LOGIN) {
+		else if (hash_table[index].valid == LOGIN) {
 			cout << "Quit" << endl;
 		}
-		else if (find(i).PASSWORD == p && find(i).valid == LOGOUT) {
+		else if (hash_table[index].valid == LOGOUT) {
+			hash_table[index].Login();
 			cout << "Submit" << endl;
-			find(i).valid_LOGIN();
 		}
 	}
 
-	void logout(string i) {
-		find(i).valid_LOGOUT();
+	void logOut(string id) {
+		int index = hash_func(id);
+		hash_table[index].Logout();
 		cout << "Submit" << endl;
 	}
-
-	Entry find(string i) {
-		int idx = hash_func(i);
-		int probing = 1;
-
-		while (hash_table[idx].valid != NOITEM && probing <= capacity) {
-			if (hash_table[idx].ID == i) return hash_table[idx];
-			idx += 1;
-			probing++;
-		}
-
-		return;
-
-	}
-
+	
 };
 
 int main() {
 	int T;
 	cin >> T;
-
-	HashTable* HT = new HashTable(400000);
-
+	HashTable* HT = new HashTable();
 	string s, id, p;
 	for (int i = 0; i < T; i++) {
 		cin >> s;
-		if (s == "login") {
+		if (s == "signup") {
 			cin >> id >> p;
-			HT->login(id, p);
+			HT->signUp(id, p);
+		}
+		else if (s == "login") {
+			cin >> id >> p;
+			HT->logIn(id, p);
 		}
 		else if (s == "logout") {
 			cin >> id;
-			HT->logout(id);
-		}
-		else if (s == "signup") {
-			cin >> id >> p;
-			HT->signup(id, p);
+			HT->logOut(id);
 		}
 	}
+
 }
